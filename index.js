@@ -83,26 +83,26 @@ function confidence_interval(times) {
 
 function format_time(time) {
   if(time[0] > 3600)
-    return two_decimals(time[0] / 3600)       + 'h '
+    return two_decimals(time[0] / 3600)           + 'h '
   else if (time[0] > 60)
-    return two_decimals(time[0] / 60)         + 'm '
+    return two_decimals(time[0] / 60)             + 'm '
   else if (time[0] > 0)
     return two_decimals(time[0] + time[1] / 1e9)  + 's '
   else if (time[1].toString().length > 6) 
-    return two_decimals(time[1] / 1e6)        + 'ms'
+    return two_decimals(time[1] / 1e6)            + 'ms'
   else 
-    return two_decimals(time[1] / 1e3)        + 'μs'
+    return two_decimals(time[1] / 1e3)            + 'μs'
 }
 
 function format_bytes(bytes) {
   if(bytes > (1024 * 1024 * 1024))
     return two_decimals(bytes/(1024 * 1024 * 1024)) + 'GB'
   else if (bytes > (1024 * 1024))
-    return two_decimals(bytes/(1024 * 1024))    + 'MB'
+    return two_decimals(bytes/(1024 * 1024))        + 'MB'
   else if (bytes > 1024)
-    return two_decimals(bytes/1024)         + 'KB'
+    return two_decimals(bytes/1024)                 + 'KB'
   else 
-    return bytes                  + 'B'
+    return bytes                                    + 'B'
 }
 
 function test(url, cb) {
