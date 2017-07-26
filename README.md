@@ -29,7 +29,6 @@ Concurrently running 10 tests
  Total     65.8ms     45.75ms    119ms     ±0.01   ±4.62ms     
 
  60 requests in 283.49ms (92.22KB received)
- Requests/sec: 911.74
  Transfer/sec: 1.36MB
 
 Warning: you may need to increase the amount of tests (-d) as it
