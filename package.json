@@ -1,6 +1,6 @@
 {
   "name": "whk",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Modern HTTP/TLS benchmarking tool",
   "main": "index.js",
   "scripts": {
@@ -9,7 +9,7 @@
   "author": "Trevor Linton",
   "license": "MIT",
   "bin":{
-    "whack":"./cli.js"
+    "whk":"./cli.js"
   },
   "dependencies": {
     "cli-table2": "^0.2.0",

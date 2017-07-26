@@ -1,7 +1,9 @@
+#!/usr/bin/env node 
+'use strict'
+
 const whack = require('./index.js')
 const Table = require('cli-table2')
 const yargs = require('yargs');
-
 
 let argv = yargs.usage('usage: $0 URL')
 	 .option('d', {alias:'duration', demandOption:true, default:20, describe:'The amount of samples to take.'})
