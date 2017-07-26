@@ -1,0 +1,18 @@
+{
+  "name": "whk",
+  "version": "1.0.0",
+  "description": "Modern HTTP/TLS benchmarking tool",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Trevor Linton",
+  "license": "MIT",
+  "bin":{
+    "whack":"./cli.js"
+  },
+  "dependencies": {
+    "cli-table2": "^0.2.0",
+    "yargs": "^8.0.2"
+  }
+}
