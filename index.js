@@ -77,7 +77,7 @@ function confidence_interval(times) {
   let mean  = to_number(avg_time(times))
   let samples = times.length
   let zscore  = 1.96
-  let result = 1.96 * stddev / Math.sqrt(samples);
+  let result = zscore * stddev / Math.sqrt(samples);
   return [Math.floor(result), (result - Math.floor(result)) * 1e9]
 }
 
