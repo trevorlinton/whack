@@ -34,7 +34,6 @@ Concurrently running 10 tests
 
 Warning: you may need to increase the amount of tests (-d) as it
 has too much variance to be reliable, recommended size: 187
-
 ```
 
 ### Measurements

@@ -1,6 +1,6 @@
 {
   "name": "whk",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Modern HTTP/TLS benchmarking tool",
   "main": "index.js",
   "scripts": {
@@ -10,6 +10,10 @@
   "license": "MIT",
   "bin":{
     "whk":"./cli.js"
+  },
+  "repository":{
+    "type":"git",
+    "url":"https://github.com/trevorlinton/whack"
   },
   "dependencies": {
     "cli-table2": "^0.2.0",
