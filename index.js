@@ -58,7 +58,7 @@ function max_time(times) {
 function std_time(times) {
 	let avg = avg_time(times);
 	let E = times.reduce((a, b) => { return a + Math.pow((b[0] - avg[0] + (b[1] - avg[1])/1e9), 2); }, 0);
-	let dev = Math.sqrt(1/times.length * E)
+	let dev = Math.sqrt(1 / times.length * E)
 	return dev;
 }
 
@@ -68,6 +68,19 @@ function est_sample_size(stddev) {
 	return Math.round(3.8416 * stddev * (1 - stddev) / (0.0025));
 }
 
+function to_number(time) {
+	return time[0] + time[1] / 1e9
+}
+
+function confidence_interval(times) {
+	let stddev 	= std_time(times)
+	let mean 	= to_number(avg_time(times))
+	let samples = times.length
+	let zscore 	= 1.96
+	let result = 1.96 * stddev / Math.sqrt(samples);
+	return [Math.floor(result), (result - Math.floor(result)) * 1e9]
+}
+
 function format_time(time) {
 	if(time[0] > 3600)
 		return two_decimals(time[0] / 3600) 			+ 'h '
@@ -75,11 +88,7 @@ function format_time(time) {
 		return two_decimals(time[0] / 60) 				+ 'm '
 	else if (time[0] > 0)
 		return two_decimals(time[0] + time[1] / 1e9) 	+ 's '
-	else if (time[1].toString().length === 9)
-		return two_decimals(time[1] / 1e6) 				+ 'ms'
-	else if (time[1].toString().length === 8) 
-		return two_decimals(time[1] / 1e6) 				+ 'ms'
-	else if (time[1].toString().length === 7) 
+	else if (time[1].toString().length > 6) 
 		return two_decimals(time[1] / 1e6)  			+ 'ms'
 	else 
 		return two_decimals(time[1] / 1e3)  			+ 'μs'
@@ -146,5 +155,6 @@ module.exports = {
 	avg_time, 
 	normalize_time, 
 	two_decimals,
-	est_sample_size
+	est_sample_size,
+	confidence_interval
 }
