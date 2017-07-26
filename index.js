@@ -74,10 +74,10 @@ function to_number(time) {
 
 function confidence_interval(times) {
   let stddev  = std_time(times)
-  let mean  = to_number(avg_time(times))
+  let mean    = to_number(avg_time(times))
   let samples = times.length
   let zscore  = 1.96
-  let result = zscore * stddev / Math.sqrt(samples);
+  let result  = zscore * stddev / Math.sqrt(samples);
   return [Math.floor(result), (result - Math.floor(result)) * 1e9]
 }
 
@@ -106,23 +106,23 @@ function format_bytes(bytes) {
 }
 
 function test(url, cb) {
-  let total_time      = process.hrtime()
-  let initial_time    = process.hrtime()
-  let connect_time    = null
+  let total_time          = process.hrtime()
+  let initial_time        = process.hrtime()
+  let connect_time        = null
   let time_to_first_byte  = null
   let time_to_last_byte   = null
-  let secure        = url.startsWith('https://')
-  let connector       = secure ? https : http
+  let secure              = url.startsWith('https://')
+  let connector           = secure ? https : http
 
   let request = connector.request(url, (res) => {
     
     time_to_first_byte  = process.hrtime(initial_time);
-    initial_time    = process.hrtime();
-    let data      = Buffer.alloc(0);
-
+    initial_time        = process.hrtime();
+    let data            = Buffer.alloc(0);
+    
     res.on('data', (chunk) => { data = Buffer.concat([data, chunk]) })
     res.on('end', () => {
-      total_time      = process.hrtime(total_time);
+      total_time          = process.hrtime(total_time);
       time_to_last_byte   = process.hrtime(initial_time);
       cb(connect_time, time_to_first_byte, time_to_last_byte, total_time, data.length);
     })

@@ -16,16 +16,16 @@ if(argv._.length === 0) {
   process.exit(1)
 }
 
-let responded   = 0,
-  expected  = argv.duration,
-  running   = 0,
-  allowed   = argv.concurrent,
-  cts     = [], 
-  ttfbs     = [], 
-  ttlbs     = [], 
-  tts     = [],
+let responded = 0,
+  expected    = argv.duration,
+  running     = 0,
+  allowed     = argv.concurrent,
+  cts         = [], 
+  ttfbs       = [], 
+  ttlbs       = [], 
+  tts         = [],
   total_bytes = 0,
-  url     = argv._[0];
+  url         = argv._[0];
 
 function format(name, time) {
   return [
@@ -49,9 +49,9 @@ let cb = function (connect_time, time_to_first_byte, time_to_last_byte, total_ti
   responded++;
   running--;
   if(responded === expected) {
-    let time      = whack.avg_time(tts)
-    time        = time[0] + time[1] / 1e9
-    let done_time   = process.hrtime(begin_time)
+    let time            = whack.avg_time(tts)
+    time                = time[0] + time[1] / 1e9
+    let done_time       = process.hrtime(begin_time)
     let avg_est_samples = Math.round(
       ( 
         whack.est_sample_size(whack.std_time(cts)) + 
