@@ -22,14 +22,15 @@ This will run 20 concurrent tests against www.somewebsite.com
 Running 60 tests @ https://www.somewebsite.com
 Concurrently running 10 tests
 
- Stat      Avg        Min       Max       +/- σ   +/- ci(95%) 
- Connect   28.44ms    6.68ms    69.37ms   ±0.01   ±4.55ms     
- TTFB      101.37ms   6.48ms    2.1s      ±0.37   ±94.59ms    
- TTLB      239.2μs    87.4μs    2.8ms     ±0      ±0.08ms     
- Total     130.05ms   13.38ms   2.15s     ±0.37   ±95.1ms     
+ Stat      Avg        Min        Max       +/- σ   +/- ci(95%) 
+ Connect   37.25ms    21.18ms    71.54ms   ±0.01   ±3.32ms     
+ TTFB      28.25ms    18.63ms    86.06ms   ±0      ±2.4ms      
+ TTLB      297.52μs   110.69μs   2.43ms    ±0      ±0.09ms     
+ Total     65.8ms     45.75ms    119ms     ±0.01   ±4.62ms     
 
- 60 requests in 2.18s  (92.22KB received)
- Rate      709.14KB/sec
+ 60 requests in 283.49ms (92.22KB received)
+ Requests/sec: 911.74
+ Transfer/sec: 1.36MB
 
 Warning: you may need to increase the amount of tests (-d) as it
 has too much variance to be reliable, recommended size: 187

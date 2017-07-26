@@ -74,8 +74,9 @@ let cb = function (connect_time, time_to_first_byte, time_to_last_byte, total_ti
 		console.log()
 		console.log(table.toString())
 		console.log()
-		console.log(' ' + responded + ' requests in ' + whack.format_time(done_time) + ' (' + whack.format_bytes(total_bytes) + ' received)');
-		console.log(' Rate     ', whack.format_bytes(total_bytes/time) + '/sec')
+		console.log(' ' + responded + ' requests in ' + whack.format_time(done_time) + ' (' + whack.format_bytes(total_bytes) + ' received)')
+		console.log(' Requests/sec:', whack.two_decimals(responded/time))
+		console.log(' Transfer/sec:', whack.format_bytes(total_bytes/time))
 		if(avg_est_samples > responded) {
 			console.log()
 			console.log('Warning: you may need to increase the amount of tests (-d) as it')
