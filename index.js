@@ -55,10 +55,14 @@ function max_time(times) {
   return sorted[0];
 }
 
+function to_number(time) {
+  return time[0] + time[1] / 1e9
+}
+
 function std_time(times) {
   let avg = avg_time(times);
-  let E = times.reduce((a, b) => { return a + Math.pow((b[0] - avg[0] + (b[1] - avg[1])/1e9), 2); }, 0);
-  let dev = Math.sqrt(1 / times.length * E)
+  let E = times.reduce((a, b) => { return a + Math.pow(to_number(b) - to_number(avg), 2); }, 0);
+  let dev = Math.sqrt(E / (times.length - 1))
   return dev;
 }
 
@@ -68,9 +72,6 @@ function est_sample_size(stddev) {
   return Math.round(3.8416 * stddev * (1 - stddev) / (0.0025));
 }
 
-function to_number(time) {
-  return time[0] + time[1] / 1e9
-}
 
 function confidence_interval(times) {
   let stddev  = std_time(times)
