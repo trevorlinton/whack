@@ -14,7 +14,7 @@ $ npm install -g whk
 $ whk https://www.somewebsite.com -d 100 -c 10
 ```
 
-This will run 20 concurrent tests against www.somewebsite.com
+This will run 100 tests, 10 concurrently against www.somewebsite.com
 
 ## Output
 
