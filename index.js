@@ -106,10 +106,12 @@ function format_bytes(bytes) {
     return bytes                                    + 'B'
 }
 
-function test(url, cb) {
+function test(method, url, headers, keepAlive, noDelay, cb) {
   let total_time          = process.hrtime()
   let initial_time        = process.hrtime()
+  let dns_lookup_time     = null
   let connect_time        = null
+  let tls_time            = null
   let time_to_first_byte  = null
   let time_to_last_byte   = null
   let secure              = url.startsWith('https://')
@@ -117,39 +119,55 @@ function test(url, cb) {
 
   let request = connector.request(url, (res) => {
     
-    time_to_first_byte  = process.hrtime(initial_time);
-    initial_time        = process.hrtime();
-    let data            = Buffer.alloc(0);
+    time_to_first_byte  = process.hrtime(initial_time)
+    initial_time        = process.hrtime()
+    let data            = Buffer.alloc(0)
     
     res.on('data', (chunk) => { data = Buffer.concat([data, chunk]) })
     res.on('end', () => {
-      total_time          = process.hrtime(total_time);
-      time_to_last_byte   = process.hrtime(initial_time);
-      cb(connect_time, time_to_first_byte, time_to_last_byte, total_time, data.length);
+      time_to_last_byte   = process.hrtime(initial_time)
+      total_time          = process.hrtime(total_time)
+      let samples         = {
+        connect:connect_time, 
+        ttfb:time_to_first_byte, 
+        ttlb:time_to_last_byte, 
+        total:total_time, 
+        tls:secure ? tls_time : [0,0], 
+        dns_lookup:dns_lookup_time, 
+        size:data.length
+      }
+      cb(samples);
     })
   })
   request.on('socket', (socket) => {
-    // TODO: Support https connect and secureConnect
     if(secure) {
       socket.on('secureConnect', () => {
-        connect_time = process.hrtime(initial_time);
-        initial_time = process.hrtime();
-      })
-    } else {
-      socket.on('connect', () => {
-        connect_time = process.hrtime(initial_time);
-        initial_time = process.hrtime();
+        tls_time      = process.hrtime(initial_time)
+        initial_time  = process.hrtime()
       })
     }
+    socket.on('connect', () => {
+      connect_time    = process.hrtime(initial_time)
+      initial_time    = process.hrtime()
+    })
+    socket.on('lookup', () => {
+      dns_lookup_time = process.hrtime(initial_time)
+      initial_time    = process.hrtime()
+    });
   })
-  request.setNoDelay(true)
-  request.end();
+  request.setNoDelay(noDelay)
+  request.setSocketKeepAlive(keepAlive)
+  if(headers) {
+    Object.keys(headers).forEach((header) => { request.setHeader(header, headers[header]); });
+  }
+  request.end()
 }
 
 module.exports = {
   test, 
   format_bytes, 
-  format_time, 
+  format_time,
+  to_number,
   std_time, 
   max_time, 
   min_time, 

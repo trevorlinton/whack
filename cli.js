@@ -8,6 +8,10 @@ const yargs = require('yargs');
 let argv = yargs.usage('usage: $0 URL')
    .option('d', {alias:'duration', demandOption:true, default:20, describe:'The amount of samples to take.'})
    .option('c', {alias:'concurrent', demandOption:true, default:20, describe:'Maximum amount of samples to allow at once.'})
+   .option('X', {demandOption:false, default:'GET', describe:'The method to use for the requests.'})
+   .option('H', {demandOption:false, describe:'Add headers to the request.'})
+   .option('keep-alive', {demandOption:false, default:false, describe:'Whether to keep alive socket connections.'})
+   .option('no-delay', {demandOption:false, default:true, describe:'Whether to buffer read and write data (TCP_NO_DELAY)'})
    .help()
    .argv;
 
@@ -24,6 +28,8 @@ let responded = 0,
   ttfbs       = [], 
   ttlbs       = [], 
   tts         = [],
+  dns         = [],
+  tls         = [],
   total_bytes = 0,
   url         = argv._[0];
 
@@ -40,17 +46,17 @@ function format(name, time) {
 
 let begin_time = process.hrtime();
 
-let cb = function (connect_time, time_to_first_byte, time_to_last_byte, total_time, bytes_received) {
-  total_bytes += bytes_received
-  cts.push(connect_time)
-  ttfbs.push(time_to_first_byte)
-  ttlbs.push(time_to_last_byte)
-  tts.push(total_time)
+let cb = function (time) {
+  total_bytes += time.size
+  cts.push(time.connect)
+  ttfbs.push(time.ttfb)
+  ttlbs.push(time.ttlb)
+  tts.push(time.total)
+  dns.push(time.dns_lookup)
+  tls.push(time.tls)
   responded++;
   running--;
   if(responded === expected) {
-    let time            = whack.avg_time(tts)
-    time                = time[0] + time[1] / 1e9
     let done_time       = process.hrtime(begin_time)
     let avg_est_samples = Math.round(
       ( 
@@ -67,7 +73,9 @@ let cb = function (connect_time, time_to_first_byte, time_to_last_byte, total_ti
         style: { 'padding-left': 1, 'padding-right': 1 }
       })
     table.push(['Stat','Avg','Min','Max','+/- σ','+/- ci(95%)']);
+    table.push(format('DNS', dns))
     table.push(format('Connect', cts))
+    table.push(format('TLS', tls))
     table.push(format('TTFB', ttfbs))
     table.push(format('TTLB', ttlbs))
     table.push(format('Total', tts))
@@ -75,8 +83,8 @@ let cb = function (connect_time, time_to_first_byte, time_to_last_byte, total_ti
     console.log(table.toString())
     console.log()
     console.log(' ' + responded + ' requests in ' + whack.format_time(done_time) + ' (' + whack.format_bytes(total_bytes) + ' received)')
-    //console.log(' Requests/sec:', whack.two_decimals(responded/time))
-    console.log(' Transfer/sec:', whack.format_bytes(total_bytes/time))
+    console.log(' Requests/sec:', whack.two_decimals(responded/whack.to_number(done_time)))
+    console.log(' Transfer/sec:', whack.format_bytes(total_bytes/whack.to_number(done_time)))
     if(avg_est_samples > responded) {
       console.log()
       console.log('Warning: you may need to increase the amount of tests (-d) as it')
@@ -88,12 +96,26 @@ let cb = function (connect_time, time_to_first_byte, time_to_last_byte, total_ti
   }
 }
 
+let headers = null
+if(argv.H) {
+  if(typeof argv.H === 'string') {
+    argv.H = [argv.H]
+  }
+  headers = {};
+  argv.H.forEach((h) => { 
+    if(h.indexOf(':') !== -1) {
+      let tokens = h.split(':')
+      headers[tokens.shift()] = tokens.join(':').trim()
+    }
+  })
+}
+
 let run = function() {
   if(allowed > running && (responded + running) < expected) {
     let queue = allowed - running;
     for(let i=0; i < queue; i++) {
       running++;
-      whack.test(url, cb)
+      whack.test(argv.X, url, headers, argv.keepAlive, argv.noDelay, cb)
     }
   }
 }
