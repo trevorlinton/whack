@@ -13,6 +13,7 @@ let argv = yargs.usage('usage: $0 URL')
    .option('keep-alive', {demandOption:false, default:false, describe:'Whether to keep alive socket connections.'})
    .option('no-delay', {demandOption:false, default:true, describe:'Whether to buffer read and write data (TCP_NO_DELAY)'})
    .option('insecure', {alias:'k', demandOption:false, default:false, describe:'Whether to allow insecure (bad TLS certificate/mismatch hostname) connections.'})
+   .wrap(yargs.terminalWidth())
    .help()
    .argv;
 
