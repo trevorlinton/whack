@@ -1,6 +1,6 @@
 {
   "name": "whk",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Modern HTTP/TLS benchmarking tool",
   "main": "index.js",
   "scripts": {
