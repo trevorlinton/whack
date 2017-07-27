@@ -12,6 +12,7 @@ let argv = yargs.usage('usage: $0 URL')
    .option('H', {demandOption:false, describe:'Add headers to the request.'})
    .option('keep-alive', {demandOption:false, default:false, describe:'Whether to keep alive socket connections.'})
    .option('no-delay', {demandOption:false, default:true, describe:'Whether to buffer read and write data (TCP_NO_DELAY)'})
+   .option('insecure', {alias:'k', demandOption:false, default:false, describe:'Whether to allow insecure (bad TLS certificate/mismatch hostname) connections.'})
    .help()
    .argv;
 
@@ -33,14 +34,16 @@ let responded = 0,
   total_bytes = 0,
   url         = argv._[0];
 
-function format(name, time) {
+function format(name, times, done) {
+  let percent = whack.two_decimals(whack.to_number(whack.avg_time(times))/whack.to_number(whack.avg_time(done)) * 100) + '%';
   return [
     name, 
-    whack.format_time(whack.avg_time(time)), 
-    whack.format_time(whack.min_time(time)), 
-    whack.format_time(whack.max_time(time)), 
-    '±'+whack.two_decimals(whack.std_time(time)),
-    '±'+whack.format_time(whack.confidence_interval(time))
+    whack.format_time(whack.avg_time(times)), 
+    whack.format_time(whack.min_time(times)), 
+    whack.format_time(whack.max_time(times)), 
+    (times.length > 1 ? ('±'+whack.two_decimals(whack.std_time(times))) : 'n/a'),
+    (times.length > 1 ? ('±'+whack.format_time(whack.confidence_interval(times))) : 'n/a'),
+    percent
   ]
 }
 
@@ -72,13 +75,13 @@ let cb = function (time) {
                , 'right': '' , 'right-mid': '' , 'middle': ' ' },
         style: { 'padding-left': 1, 'padding-right': 1 }
       })
-    table.push(['Stat','Avg','Min','Max','+/- σ','+/- ci(95%)']);
-    table.push(format('DNS', dns))
-    table.push(format('Connect', cts))
-    table.push(format('TLS', tls))
-    table.push(format('TTFB', ttfbs))
-    table.push(format('TTLB', ttlbs))
-    table.push(format('Total', tts))
+    table.push(['Stat','Avg','Min','Max','+/- σ','+/- ci(95%)', 'Request%']);
+    table.push(format('DNS', dns, tts))
+    table.push(format('Connect', cts, tts))
+    table.push(format('TLS', tls, tts))
+    table.push(format('TTFB', ttfbs, tts))
+    table.push(format('TTLB', ttlbs, tts))
+    table.push(format('Total', tts, tts))
     console.log()
     console.log(table.toString())
     console.log()
@@ -115,7 +118,7 @@ let run = function() {
     let queue = allowed - running;
     for(let i=0; i < queue; i++) {
       running++;
-      whack.test(argv.X, url, headers, argv.keepAlive, argv.noDelay, cb)
+      whack.test(argv.X, url, headers, argv.keepAlive, argv.noDelay, argv.insecure, cb)
     }
   }
 }

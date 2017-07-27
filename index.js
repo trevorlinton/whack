@@ -1,8 +1,9 @@
-const https = require('https');
-const http = require('http');
+const https   = require('https')
+const http    = require('http')
+const url     = require('url')
 
 function two_decimals(num) {
-  return (Math.floor(num * 100)/100).toString();
+  return (Math.floor(num * 100)/100).toString()
 }
 
 function normalize_time(time) {
@@ -106,7 +107,7 @@ function format_bytes(bytes) {
     return bytes                                    + 'B'
 }
 
-function test(method, url, headers, keepAlive, noDelay, cb) {
+function test(method, request_url, headers, keepAlive, noDelay, allowInsecure, cb) {
   let total_time          = process.hrtime()
   let initial_time        = process.hrtime()
   let dns_lookup_time     = null
@@ -114,10 +115,18 @@ function test(method, url, headers, keepAlive, noDelay, cb) {
   let tls_time            = null
   let time_to_first_byte  = null
   let time_to_last_byte   = null
-  let secure              = url.startsWith('https://')
+  let secure              = request_url.startsWith('https://')
   let connector           = secure ? https : http
+  let options             = url.parse(request_url)
 
-  let request = connector.request(url, (res) => {
+  if(allowInsecure && secure) {
+    options.agent = new connector.Agent({rejectUnauthorized:false, checkServerIdentity:()=>{}});
+  }
+  if(headers) {
+    options.headers = headers;
+  }
+
+  let request = connector.request(options, (res) => {
     
     time_to_first_byte  = process.hrtime(initial_time)
     initial_time        = process.hrtime()
@@ -133,7 +142,7 @@ function test(method, url, headers, keepAlive, noDelay, cb) {
         ttlb:time_to_last_byte, 
         total:total_time, 
         tls:secure ? tls_time : [0,0], 
-        dns_lookup:dns_lookup_time, 
+        dns_lookup:dns_lookup_time ? dns_lookup_time : [0, 0], 
         size:data.length
       }
       cb(samples);
@@ -157,9 +166,6 @@ function test(method, url, headers, keepAlive, noDelay, cb) {
   })
   request.setNoDelay(noDelay)
   request.setSocketKeepAlive(keepAlive)
-  if(headers) {
-    Object.keys(headers).forEach((header) => { request.setHeader(header, headers[header]); });
-  }
   request.end()
 }
 
