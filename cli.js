@@ -35,6 +35,10 @@ let responded = 0,
   total_bytes = 0,
   url         = argv._[0];
 
+if(!url.startsWith('http://') && !url.startsWith('https://')) {
+  url = 'https://' + url
+}
+
 function format(name, times, done) {
   let percent = whack.two_decimals(whack.to_number(whack.avg_time(times))/whack.to_number(whack.avg_time(done)) * 100) + '%';
   return [
