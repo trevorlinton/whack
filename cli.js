@@ -69,20 +69,21 @@ let cb = function (time) {
   running--;
   if(responded === expected) {
     let done_time       = process.hrtime(begin_time)
-    let avg_est_samples = Math.round(
-      ( 
+    let avg_est_samples = Math.round( ( 
         whack.est_sample_size(whack.std_time(cts)) + 
         whack.est_sample_size(whack.std_time(ttfbs)) + 
         whack.est_sample_size(whack.std_time(ttlbs)) + 
         whack.est_sample_size(whack.std_time(tts))
-      ) / 4) 
-    let table       = new Table({
-        chars: { 'top': '' , 'top-mid': '' , 'top-left': '' , 'top-right': ''
-               , 'bottom': '' , 'bottom-mid': '' , 'bottom-left': '' , 'bottom-right': ''
-               , 'left': '' , 'left-mid': '' , 'mid': '' , 'mid-mid': ''
-               , 'right': '' , 'right-mid': '' , 'middle': ' ' },
+    ) / 4) 
+    let table = new Table({
+        chars: {
+          'top':'', 'top-mid':'', 'top-left':'', 'top-right':'', 
+          'bottom':'', 'bottom-mid':'', 'bottom-left':'', 'bottom-right':'', 
+          'left':'', 'left-mid':'', 'mid':'', 'mid-mid':'', 
+          'right':'', 'right-mid':'', 'middle':' '
+        },
         style: { 'padding-left': 1, 'padding-right': 1 }
-      })
+    })
     table.push(['Stat','Avg','Min','Max','+/- σ','+/- ci(95%)', 'Request%']);
     table.push(format('DNS', dns, tts))
     table.push(format('Connect', cts, tts))
@@ -133,6 +134,7 @@ let run = function() {
 
 console.log('Running ' + expected + ' tests @ ' + url)
 console.log('Concurrently running ' + allowed + ' tests')
+
 run();
 
 
