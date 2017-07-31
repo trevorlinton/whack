@@ -11,7 +11,7 @@ $ npm install -g whk
 ## Usage
 
 ```bash
-$ whk https://www.somewebsite.com -d 100 -c 10
+$ whk https://www.somewebsite.com -a 100 -c 10
 ```
 
 This will run 100 tests, 10 concurrently against www.somewebsite.com
@@ -58,7 +58,7 @@ has too much variance to be reliable, recommended size: 187
 ## Command Line Options
 
 ```bash
-  -d, --duration    The amount of samples to take.
+  -a, --amount 		The amount of samples to take.
   -c, --concurrent  Maximum amount of samples to allow at once
   -X                The method to use for the requests
   -H                Add headers to the request

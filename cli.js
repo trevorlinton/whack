@@ -6,24 +6,27 @@ const Table = require('cli-table2')
 const yargs = require('yargs');
 
 let argv = yargs.usage('usage: $0 URL')
-   .option('d', {alias:'duration', demandOption:true, default:20, describe:'The amount of samples to take.'})
+   .option('a', {alias:'amount', demandOption:true, default:20, describe:'The amount of samples to take.'})
    .option('c', {alias:'concurrent', demandOption:true, default:20, describe:'Maximum amount of samples to allow at once.'})
    .option('X', {demandOption:false, default:'GET', describe:'The method to use for the requests.'})
    .option('H', {demandOption:false, describe:'Add headers to the request.'})
    .option('keep-alive', {demandOption:false, default:false, describe:'Whether to keep alive socket connections.'})
    .option('no-delay', {demandOption:false, default:true, describe:'Whether to buffer read and write data (TCP_NO_DELAY)'})
    .option('insecure', {alias:'k', demandOption:false, default:false, describe:'Whether to allow insecure (bad TLS certificate/mismatch hostname) connections.'})
+   .option('version', {alias:'v', describe:'display version'})
+   .demand(1)
    .wrap(yargs.terminalWidth())
    .help()
    .argv;
 
-if(argv._.length === 0) {
-  console.log('No URL was specified.')
-  process.exit(1)
+if(argv.version) {
+  const fs = require('fs')
+  console.log(JSON.parse(fs.readFileSync('./package.json')).version)
+  process.exit(0)
 }
 
 let responded = 0,
-  expected    = argv.duration,
+  expected    = argv.amount,
   running     = 0,
   allowed     = argv.concurrent,
   cts         = [], 
