@@ -14,7 +14,6 @@ let argv = yargs.usage('usage: $0 URL')
    .option('no-delay', {demandOption:false, default:true, describe:'Whether to buffer read and write data (TCP_NO_DELAY)'})
    .option('insecure', {alias:'k', demandOption:false, default:false, describe:'Whether to allow insecure (bad TLS certificate/mismatch hostname) connections.'})
    .option('version', {alias:'v', describe:'display version'})
-   .demand(1)
    .wrap(yargs.terminalWidth())
    .help()
    .argv;
@@ -23,6 +22,11 @@ if(argv.version) {
   const fs = require('fs')
   console.log(JSON.parse(fs.readFileSync('./package.json')).version)
   process.exit(0)
+}
+
+if(argv._.length === 0) {
+  console.log('No URL was specified. Usage: whk https://www.google.com')
+  process.exit(1)
 }
 
 let responded = 0,
