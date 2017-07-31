@@ -1,6 +1,5 @@
 #!/usr/bin/env node 
 'use strict'
-
 const whack = require('./index.js')
 const Table = require('cli-table2')
 const yargs = require('yargs');
@@ -20,7 +19,8 @@ let argv = yargs.usage('usage: $0 URL')
 
 if(argv.version) {
   const fs = require('fs')
-  console.log(JSON.parse(fs.readFileSync('./package.json')).version)
+  const path = require('path')
+  console.log(JSON.parse(fs.readFileSync(path.join(path.dirname(__filename), 'package.json'))).version)
   process.exit(0)
 }
 
