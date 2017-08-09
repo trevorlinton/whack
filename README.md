@@ -34,7 +34,7 @@ Concurrently running 10 tests
  Requests/sec: 81.92
  Transfer/sec: 12.96KB
 
-Warning: you may need to increase the amount of tests (-d) as it
+Warning: you may need to increase the amount of tests (-a) as it
 has too much variance to be reliable, recommended size: 187
 ```
 
