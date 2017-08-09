@@ -103,7 +103,7 @@ let cb = function (time) {
     console.log(' Transfer/sec:', whack.format_bytes(total_bytes/whack.to_number(done_time)))
     if(avg_est_samples > responded) {
       console.log()
-      console.log('Warning: you may need to increase the amount of tests (-d) as it')
+      console.log('Warning: you may need to increase the amount of tests (-a) as it')
       console.log('has too much variance to be reliable, recommended size:', avg_est_samples)
     }
     console.log()
