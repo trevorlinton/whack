@@ -62,6 +62,7 @@ has too much variance to be reliable, recommended size: 187
   -c, --concurrent  Maximum amount of samples to allow at once
   -X                The method to use for the requests
   -H                Add headers to the request
+  -d, --data 		The data to include in the body of the request
   --keep-alive      Whether to keep alive socket connections
   --no-delay        Whether to buffer read and write data (TCP_NO_DELAY)
   --insecure, -k    Whether to allow insecure (bad TLS certificate/mismatch hostname) connections.                                              

@@ -7,7 +7,8 @@ const yargs = require('yargs');
 let argv = yargs.usage('usage: $0 URL')
    .option('a', {alias:'amount', demandOption:true, default:20, describe:'The amount of samples to take.'})
    .option('c', {alias:'concurrent', demandOption:true, default:20, describe:'Maximum amount of samples to allow at once.'})
-   .option('X', {demandOption:false, default:'GET', describe:'The method to use for the requests.'})
+   .option('d', {alias:'data', demandOption:false, describe:'HTTP Post Data'})
+   .option('X', {alias:'method', demandOption:false, default:'GET', describe:'The method to use for the requests.'})
    .option('H', {demandOption:false, describe:'Add headers to the request.'})
    .option('keep-alive', {demandOption:false, default:false, describe:'Whether to keep alive socket connections.'})
    .option('no-delay', {demandOption:false, default:true, describe:'Whether to buffer read and write data (TCP_NO_DELAY)'})
@@ -131,7 +132,7 @@ let run = function() {
     let queue = allowed - running;
     for(let i=0; i < queue; i++) {
       running++;
-      whack.test(argv.X, url, headers, argv.keepAlive, argv.noDelay, argv.insecure, cb)
+      whack.test(argv.method, url, headers, argv.data, argv.keepAlive, argv.noDelay, argv.insecure, cb)
     }
   }
 }

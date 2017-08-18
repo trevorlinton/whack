@@ -107,7 +107,7 @@ function format_bytes(bytes) {
     return bytes                                    + 'B'
 }
 
-function test(method, request_url, headers, keepAlive, noDelay, allowInsecure, cb) {
+function test(method, request_url, headers, payload, keepAlive, noDelay, allowInsecure, cb) {
   let total_time          = process.hrtime()
   let initial_time        = process.hrtime()
   let dns_lookup_time     = null
@@ -125,6 +125,7 @@ function test(method, request_url, headers, keepAlive, noDelay, allowInsecure, c
   if(headers) {
     options.headers = headers;
   }
+  options.method = method;
 
   let request = connector.request(options, (res) => {
     
@@ -162,10 +163,13 @@ function test(method, request_url, headers, keepAlive, noDelay, allowInsecure, c
     socket.on('lookup', () => {
       dns_lookup_time = process.hrtime(initial_time)
       initial_time    = process.hrtime()
-    });
+    })
   })
   request.setNoDelay(noDelay)
   request.setSocketKeepAlive(keepAlive)
+  if(payload) {
+    request.write(payload)
+  }
   request.end()
 }
 
