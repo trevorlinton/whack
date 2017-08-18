@@ -58,11 +58,11 @@ has too much variance to be reliable, recommended size: 187
 ## Command Line Options
 
 ```bash
-  -a, --amount 		The amount of samples to take.
+  -a, --amount      The amount of samples to take.
   -c, --concurrent  Maximum amount of samples to allow at once
   -X                The method to use for the requests
   -H                Add headers to the request
-  -d, --data 		The data to include in the body of the request
+  -d, --data        The data to include in the body of the request
   --keep-alive      Whether to keep alive socket connections
   --no-delay        Whether to buffer read and write data (TCP_NO_DELAY)
   --insecure, -k    Whether to allow insecure (bad TLS certificate/mismatch hostname) connections.                                              
