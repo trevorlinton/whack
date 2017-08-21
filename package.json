@@ -8,12 +8,12 @@
   },
   "author": "Trevor Linton",
   "license": "MIT",
-  "bin":{
-    "whk":"./cli.js"
+  "bin": {
+    "whk": "./cli.js"
   },
-  "repository":{
-    "type":"git",
-    "url":"https://github.com/trevorlinton/whack"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/trevorlinton/whack"
   },
   "dependencies": {
     "cli-table2": "^0.2.0",

@@ -13,6 +13,7 @@ let argv = yargs.usage('usage: $0 URL')
    .option('keep-alive', {demandOption:false, default:false, describe:'Whether to keep alive socket connections.'})
    .option('no-delay', {demandOption:false, default:true, describe:'Whether to buffer read and write data (TCP_NO_DELAY)'})
    .option('insecure', {alias:'k', demandOption:false, default:false, describe:'Whether to allow insecure (bad TLS certificate/mismatch hostname) connections.'})
+   .option('json', {demandOption:false, default:false, describe:'Print data out in JSON format. Note: time is expressed as an array [s, ns] (see process.hrtime)'})
    .option('version', {alias:'v', describe:'display version'})
    .wrap(yargs.terminalWidth())
    .help()
@@ -26,7 +27,7 @@ if(argv.version) {
 }
 
 if(argv._.length === 0) {
-  console.log('No URL was specified. Usage: whk https://www.google.com')
+  console.log('No URL was specified. Usage: whk https://www.website.com')
   process.exit(1)
 }
 
@@ -79,35 +80,60 @@ let cb = function (time) {
         whack.est_sample_size(whack.std_time(ttfbs)) + 
         whack.est_sample_size(whack.std_time(ttlbs)) + 
         whack.est_sample_size(whack.std_time(tts))
-    ) / 4) 
-    let table = new Table({
-        chars: {
-          'top':'', 'top-mid':'', 'top-left':'', 'top-right':'', 
-          'bottom':'', 'bottom-mid':'', 'bottom-left':'', 'bottom-right':'', 
-          'left':'', 'left-mid':'', 'mid':'', 'mid-mid':'', 
-          'right':'', 'right-mid':'', 'middle':' '
-        },
-        style: { 'padding-left': 1, 'padding-right': 1 }
-    })
-    table.push(['Stat','Avg','Min','Max','+/- σ','+/- ci(95%)', 'Request%']);
-    table.push(format('DNS', dns, tts))
-    table.push(format('Connect', cts, tts))
-    table.push(format('TLS', tls, tts))
-    table.push(format('TTFB', ttfbs, tts))
-    table.push(format('TTLB', ttlbs, tts))
-    table.push(format('Total', tts, tts))
-    console.log()
-    console.log(table.toString())
-    console.log()
-    console.log(' ' + responded + ' requests in ' + whack.format_time(done_time) + ' (' + whack.format_bytes(total_bytes) + ' received)')
-    console.log(' Requests/sec:', whack.two_decimals(responded/whack.to_number(done_time)))
-    console.log(' Transfer/sec:', whack.format_bytes(total_bytes/whack.to_number(done_time)))
-    if(avg_est_samples > responded) {
+    ) / 4)
+    let too_little_samples = avg_est_samples > responded
+    let print_table = function() {
+      let table = new Table({
+          chars: {
+            'top':'', 'top-mid':'', 'top-left':'', 'top-right':'', 
+            'bottom':'', 'bottom-mid':'', 'bottom-left':'', 'bottom-right':'', 
+            'left':'', 'left-mid':'', 'mid':'', 'mid-mid':'', 
+            'right':'', 'right-mid':'', 'middle':' '
+          },
+          style: { 'padding-left': 1, 'padding-right': 1 }
+      })
+      table.push(['Stat','Avg','Min','Max','+/- σ','+/- ci(95%)', 'Request%']);
+      table.push(format('DNS', dns, tts))
+      table.push(format('Connect', cts, tts))
+      table.push(format('TLS', tls, tts))
+      table.push(format('TTFB', ttfbs, tts))
+      table.push(format('TTLB', ttlbs, tts))
+      table.push(format('Total', tts, tts))
       console.log()
-      console.log('Warning: you may need to increase the amount of tests (-a) as it')
-      console.log('has too much variance to be reliable, recommended size:', avg_est_samples)
+      console.log(table.toString())
+      console.log()
+      console.log(' ' + responded + ' requests in ' + whack.format_time(done_time) + ' (' + whack.format_bytes(total_bytes) + ' received)')
+      console.log(' Requests/sec:', whack.two_decimals(responded/whack.to_number(done_time)))
+      console.log(' Transfer/sec:', whack.format_bytes(total_bytes/whack.to_number(done_time)))
+      if(too_little_samples) {
+        console.log()
+        console.log('Warning: you may need to increase the amount of tests (-a) as it')
+        console.log('has too much variance to be reliable, recommended size:', avg_est_samples)
+      }
+      console.log()
     }
-    console.log()
+    let print_json = function() {
+      console.log(JSON.stringify({
+        data:{
+          dns:{raw:dns, avg:whack.avg_time(dns), min:whack.min_time(dns), max:whack.max_time(dns), std:whack.std_time(dns), ci:whack.confidence_interval(dns)},
+          cts:{raw:cts, avg:whack.avg_time(cts), min:whack.min_time(cts), max:whack.max_time(cts), std:whack.std_time(cts), ci:whack.confidence_interval(cts)},
+          tls:{raw:tls, avg:whack.avg_time(tls), min:whack.min_time(tls), max:whack.max_time(tls), std:whack.std_time(tls), ci:whack.confidence_interval(tls)},
+          ttfb:{raw:ttfbs, avg:whack.avg_time(ttfbs), min:whack.min_time(ttfbs), max:whack.max_time(ttfbs), std:whack.std_time(ttfbs), ci:whack.confidence_interval(ttfbs)},
+          ttlb:{raw:ttlbs, avg:whack.avg_time(ttlbs), min:whack.min_time(ttlbs), max:whack.max_time(ttlbs), std:whack.std_time(ttlbs), ci:whack.confidence_interval(ttlbs)},
+        },
+        requests:responded,
+        time:done_time,
+        bytes:total_bytes,
+        needed_samples:avg_est_samples,
+        too_little_samples:too_little_samples
+      }, null, 2))
+    }
+    if(argv.json) {
+      print_json()
+    } else {
+      print_table()
+    }
+
   } else {
     run();
   }
@@ -136,10 +162,10 @@ let run = function() {
     }
   }
 }
-
-console.log('Running ' + expected + ' tests @ ' + url)
-console.log('Concurrently running ' + allowed + ' tests')
-
+if(!argv.json) {
+  console.log('Running ' + expected + ' tests @ ' + url)
+  console.log('Concurrently running ' + allowed + ' tests')
+}
 run();
 
 

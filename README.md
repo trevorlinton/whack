@@ -65,6 +65,7 @@ has too much variance to be reliable, recommended size: 187
   -d, --data        The data to include in the body of the request
   --keep-alive      Whether to keep alive socket connections
   --no-delay        Whether to buffer read and write data (TCP_NO_DELAY)
-  --insecure, -k    Whether to allow insecure (bad TLS certificate/mismatch hostname) connections.                                              
+  --insecure, -k    Whether to allow insecure (bad TLS certificate/mismatch hostname) connections.    
+  --json            Print data out in JSON format. Note: time is expressed as an array [s, ns] (see process.hrtime)
   --help            Show help
 ```

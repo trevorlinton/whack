@@ -124,8 +124,16 @@ function test(method, request_url, headers, payload, keepAlive, noDelay, allowIn
   }
   if(headers) {
     options.headers = headers;
+  } else {
+    options.headers = {};
   }
   options.method = method;
+
+  // Provide a default user agent otherwise some HTTP proxies will 
+  // break.
+  if(!options.headers['user-agent'] || !options.headers['User-Agent']) {
+    options.headers['user-agent'] = 'whack';
+  }
 
   let request = connector.request(options, (res) => {
     
