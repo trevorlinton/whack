@@ -1,7 +1,7 @@
-#!/usr/bin/env node 
+#!/usr/bin/env node
 'use strict'
 const whack = require('./index.js')
-const Table = require('cli-table2')
+const Table = require('cli-table3')
 const yargs = require('yargs');
 
 let argv = yargs.usage('usage: $0 URL')
@@ -35,9 +35,9 @@ let responded = 0,
   expected    = argv.amount,
   running     = 0,
   allowed     = argv.concurrent,
-  cts         = [], 
-  ttfbs       = [], 
-  ttlbs       = [], 
+  cts         = [],
+  ttfbs       = [],
+  ttlbs       = [],
   tts         = [],
   dns         = [],
   tls         = [],
@@ -51,10 +51,10 @@ if(!url.startsWith('http://') && !url.startsWith('https://')) {
 function format(name, times, done) {
   let percent = whack.two_decimals(whack.to_number(whack.avg_time(times))/whack.to_number(whack.avg_time(done)) * 100) + '%';
   return [
-    name, 
-    whack.format_time(whack.avg_time(times)), 
-    whack.format_time(whack.min_time(times)), 
-    whack.format_time(whack.max_time(times)), 
+    name,
+    whack.format_time(whack.avg_time(times)),
+    whack.format_time(whack.min_time(times)),
+    whack.format_time(whack.max_time(times)),
     (times.length > 1 ? ('±'+whack.two_decimals(whack.std_time(times))) : 'n/a'),
     (times.length > 1 ? ('±'+whack.format_time(whack.confidence_interval(times))) : 'n/a'),
     percent
@@ -75,19 +75,19 @@ let cb = function (time) {
   running--;
   if(responded === expected) {
     let done_time       = process.hrtime(begin_time)
-    let avg_est_samples = Math.round( ( 
-        whack.est_sample_size(whack.std_time(cts)) + 
-        whack.est_sample_size(whack.std_time(ttfbs)) + 
-        whack.est_sample_size(whack.std_time(ttlbs)) + 
+    let avg_est_samples = Math.round( (
+        whack.est_sample_size(whack.std_time(cts)) +
+        whack.est_sample_size(whack.std_time(ttfbs)) +
+        whack.est_sample_size(whack.std_time(ttlbs)) +
         whack.est_sample_size(whack.std_time(tts))
     ) / 4)
     let too_little_samples = avg_est_samples > responded
     let print_table = function() {
       let table = new Table({
           chars: {
-            'top':'', 'top-mid':'', 'top-left':'', 'top-right':'', 
-            'bottom':'', 'bottom-mid':'', 'bottom-left':'', 'bottom-right':'', 
-            'left':'', 'left-mid':'', 'mid':'', 'mid-mid':'', 
+            'top':'', 'top-mid':'', 'top-left':'', 'top-right':'',
+            'bottom':'', 'bottom-mid':'', 'bottom-left':'', 'bottom-right':'',
+            'left':'', 'left-mid':'', 'mid':'', 'mid-mid':'',
             'right':'', 'right-mid':'', 'middle':' '
           },
           style: { 'padding-left': 1, 'padding-right': 1 }
@@ -145,7 +145,7 @@ if(argv.H) {
     argv.H = [argv.H]
   }
   headers = {};
-  argv.H.forEach((h) => { 
+  argv.H.forEach((h) => {
     if(h.indexOf(':') !== -1) {
       let tokens = h.split(':')
       headers[tokens.shift()] = tokens.join(':').trim()
@@ -167,6 +167,3 @@ if(!argv.json) {
   console.log('Concurrently running ' + allowed + ' tests')
 }
 run();
-
-
-
